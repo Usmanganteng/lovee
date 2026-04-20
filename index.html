@@ -4,7 +4,7 @@
 		<title>Somebody to You</title>
 	  	<meta charset="utf-8">
 	  	<link rel="icon" href="https://gamepedia.cursecdn.com/minecraft_gamepedia/a/a7/Heart.svg?version=dac1a46352ab4c25ad78a3cef0ceea86">
-	  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+	  	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, maximum-scale=5">
 	  	<style type="text/css">
 /** Regular */
 @font-face {
@@ -33,13 +33,32 @@
 }
 	  	*{
 	  		font-family: SF Display;
-	  		cursor: default;
-			-webkit-user-select: none;
+	  		-webkit-user-select: none;
 			-khtml-user-select: none;
 			-moz-user-select: none;
 			-ms-user-select: none;
 			-o-user-select: none;
 			user-select: none;
+	  		touch-action: manipulation;
+	  	}
+	  	@media (max-width: 768px) {
+	  		.mywindow {
+	  			left: 5vw !important;
+	  			top: 5vh !important;
+	  			width: 90vw !important;
+	  			height: 80vh !important;
+	  			font-size: 10pt !important;
+	  		}
+	  		#poemWindow {
+	  			width: 95vw !important;
+	  			height: 85vh !important;
+	  		}
+	  		.poembody {
+	  			font-size: 10pt !important;
+	  		}
+	  		.mytext {
+	  			width: calc(100% - 20px) !important;
+	  		}
 	  	}
 	  	body{
 	  		overflow: hidden;
@@ -518,15 +537,12 @@
 	  		dragElement(document.getElementById("mywindow"));
 			function dragElement(elmnt) {
 			  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-			  if (document.getElementById(elmnt.id + "header")) {
-			    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-			  } else {
-			    elmnt.onmousedown = dragMouseDown;
-			  }
+			  var header = document.getElementById(elmnt.id + "header") || elmnt;
+			  header.onmousedown = dragMouseDown;
+			  header.ontouchstart = dragTouchStart;
 
 			  function dragMouseDown(e) {
 			    animasi();
-			    e = e || window.event;
 			    e.preventDefault();
 			    pos3 = e.clientX;
 			    pos4 = e.clientY;
@@ -534,8 +550,16 @@
 			    document.onmousemove = elementDrag;
 			  }
 
+			  function dragTouchStart(e) {
+			    animasi();
+			    var touch = e.touches[0];
+			    pos3 = touch.clientX;
+			    pos4 = touch.clientY;
+			    document.ontouchend = closeDragElement;
+			    document.ontouchmove = elementTouchDrag;
+			  }
+
 			  function elementDrag(e) {
-			    e = e || window.event;
 			    e.preventDefault();
 			    pos1 = pos3 - e.clientX;
 			    pos2 = pos4 - e.clientY;
@@ -545,9 +569,21 @@
 			    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
 			  }
 
+			  function elementTouchDrag(e) {
+			    var touch = e.touches[0];
+			    pos1 = pos3 - touch.clientX;
+			    pos2 = pos4 - touch.clientY;
+			    pos3 = touch.clientX;
+			    pos4 = touch.clientY;
+			    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+			    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+			  }
+
 			  function closeDragElement() {
 			    document.onmouseup = null;
 			    document.onmousemove = null;
+			    document.ontouchend = null;
+			    document.ontouchmove = null;
 			    animasi();
 			  }
 			}
